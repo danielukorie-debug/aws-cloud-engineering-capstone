@@ -12,7 +12,7 @@ Deployment status: NOT DEPLOYED.
 
 Observed plan:
 
-- 16 resources to add
+- 20 resources to add
 - 0 resources to change
 - 0 resources to destroy
 
@@ -32,28 +32,52 @@ No terraform apply was executed.
 
 These are configuration findings, not deployed controls.
 
-## Architecture Gaps
 
-1. No configured network path to Systems Manager.
-2. No internet gateway or route table for the named public subnet.
-3. No NGINX installation or application deployment.
-4. Public HTTP and HTTPS ingress rules need review.
-5. CloudWatch log collection is not configured.
-6. Alarm notifications are not configured.
-7. Cost estimates are not yet approved.
-8. Deployment permissions and quotas have not been verified.
+## Architecture Review
+
+### Addressed in Terraform Configuration
+
+1. Private subnet and dedicated route table configured.
+2. SSM and SSM Messages interface endpoints configured.
+3. Private DNS enabled for both endpoints.
+4. Endpoint HTTPS ingress restricted to the EC2 security group.
+5. Public HTTP and HTTPS ingress rules removed.
+6. EC2 public IP assignment disabled.
+
+These configurations are validated but not deployed.
+
+### Remaining Gaps
+
+1. SSM Agent installation and runtime status not verified.
+2. Session Manager connectivity not tested.
+3. NGINX installation and application deployment pending.
+4. CloudWatch log collection not configured.
+5. Alarm notifications not configured.
+6. AWS cost estimates not yet approved.
+7. Deployment permissions and quotas not verified.
 
 ## Cost Considerations
 
-Potential charges include:
+Planned AWS resources that may generate charges:
 
-- EC2 instance runtime
-- EBS storage
-- S3 storage and requests
-- CloudWatch logs and alarms
-- Future VPC endpoints, NAT gateways, or load balancers
+- EC2 t3.micro instance runtime
+- EBS gp3 root volume storage (16 GiB)
+- Two interface VPC endpoints:
+  - Systems Manager (ssm)
+  - Session Manager messaging (ssmmessages)
+- Interface endpoint hourly charges and data processing
+- Amazon S3 storage and requests
+- CloudWatch logs, metrics, and alarms
 
-No cost estimate has been calculated yet.
+The private subnet has no NAT gateway configured.
+
+VPC interface endpoints can incur hourly charges
+even when no EC2 instance is running.
+
+No AWS cost estimate has been calculated or approved.
+
+Deployment remains blocked pending cost review.
+
 
 ## Deployment Decision
 

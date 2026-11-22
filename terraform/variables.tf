@@ -16,8 +16,8 @@ variable "vpc_cidr" {
   default     = "10.20.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "IPv4 address range for the public subnet."
+variable "private_subnet_cidr" {
+  description = "IPv4 address range for the private subnet."
   type        = string
   default     = "10.20.1.0/24"
 }

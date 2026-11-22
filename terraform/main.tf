@@ -20,13 +20,13 @@ resource "aws_vpc" "capstone" {
   }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "private" {
   vpc_id                  = aws_vpc.capstone.id
-  cidr_block              = var.public_subnet_cidr
+  cidr_block              = var.private_subnet_cidr
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "${var.project_name}-public-subnet"
+    Name = "${var.project_name}-private-subnet"
   }
 }
 
@@ -38,26 +38,6 @@ resource "aws_security_group" "web" {
   tags = {
     Name = "${var.project_name}-web-sg"
   }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "http" {
-  security_group_id = aws_security_group.web.id
-
-  description = "HTTP access for future web server"
-  cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 80
-  to_port     = 80
-  ip_protocol = "tcp"
-}
-
-resource "aws_vpc_security_group_ingress_rule" "https" {
-  security_group_id = aws_security_group.web.id
-
-  description = "HTTPS access for future web server"
-  cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 443
-  to_port     = 443
-  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "https" {

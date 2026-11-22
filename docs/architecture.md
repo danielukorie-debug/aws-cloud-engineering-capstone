@@ -14,31 +14,60 @@ us-east-1
 ```mermaid
 flowchart TD
     A["Cloud Engineer"] --> B["Ubuntu WSL2"]
-    B --> C["Git and Terraform"]
-    C -. "Planned deployment" .-> D["AWS Cloud"]
+    B --> C["Git + Terraform"]
+    C -. "Plan only" .-> D
 
-    subgraph D["AWS Cloud - Planned"]
-        E["Amazon VPC"]
-        F["EC2 / NGINX"]
-        G["IAM Role"]
-        H["Amazon S3"]
-        I["Amazon CloudWatch"]
+    subgraph D["AWS VPC — 10.20.0.0/16"]
+        subgraph E["Private Subnet — 10.20.1.0/24"]
+            F["Ubuntu EC2 — t3.micro"]
+            G["SSM Endpoint"]
+            H["SSM Messages Endpoint"]
+        end
 
-        E --> F
-        G --> F
-        F -. "Planned logs" .-> H
-        F -. "Planned metrics" .-> I
+        I["Private Route Table"]
+        J["EC2 Security Group"]
+        K["Endpoint Security Group"]
+
+        I --> E
+        J --> F
+        K --> G
+        K --> H
+        F -->|"Private HTTPS 443"| G
+        F -->|"Private HTTPS 443"| H
     end
+
+    L["IAM Role + Instance Profile"] --> F
+
+    M["Amazon S3 — Planned"]
+    N["CloudWatch — Planned"]
+
+    C -. "Other planned resources" .-> M
+    C -. "Other planned resources" .-> N
 ```
 
 ## Planned AWS Resources
 
-- VPC and subnet
-- EC2 instance running NGINX
-- IAM role with least-privilege permissions
-- S3 bucket for selected artifacts
-- CloudWatch monitoring
-- Security groups
+- VPC: 10.20.0.0/16
+- Private subnet: 10.20.1.0/24
+- Private route table and subnet association
+- Ubuntu 24.04 EC2 instance (t3.micro)
+- No EC2 public IP
+- EC2 security group with outbound HTTPS
+- Dedicated SSM endpoint security group
+- SSM interface VPC endpoint
+- SSM Messages interface VPC endpoint
+- IAM role and instance profile
+- Amazon S3 with encryption, versioning,
+  and public access blocking
+- CloudWatch log group and CPU alarm
+
+NGINX installation is planned but not yet
+configured or tested.
+
+Terraform plan:
+20 to add, 0 to change, 0 to destroy.
+
+Deployment status: PLAN ONLY.
 
 ## Security Requirements
 

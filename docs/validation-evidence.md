@@ -33,9 +33,11 @@ Command:
 
 `terraform plan -input=false -lock=false -no-color`
 
-Previously observed result:
+Latest observed result:
 
-Plan: 16 to add, 0 to change, 0 to destroy.
+Plan: 20 to add, 0 to change, 0 to destroy.
+
+Deployment status: PLAN ONLY — NOT DEPLOYED.
 
 ### Security Controls
 
@@ -47,6 +49,37 @@ Plan: 16 to add, 0 to change, 0 to destroy.
 - CloudWatch log retention: 7 days
 - CloudWatch CPU alarm threshold: 80%
 - No explicit SSH ingress rule found
+
+
+### Private Networking and SSM Validation
+
+Configuration inspection confirmed:
+
+- EC2 public IP assignment disabled.
+- Private subnet: 10.20.1.0/24.
+- Dedicated private route table and association.
+- No public inbound SSH, HTTP, or HTTPS rules.
+- EC2 outbound HTTPS permitted on TCP 443.
+- SSM interface VPC endpoint configured.
+- SSM Messages interface VPC endpoint configured.
+- Private DNS enabled on both endpoints.
+- Endpoint HTTPS ingress restricted to the EC2 security group.
+- IAM role configured with AmazonSSMManagedInstanceCore.
+- IAM instance profile associated with EC2.
+
+Observed commands:
+
+```bash
+terraform fmt -check
+terraform validate
+```
+
+Observed validation result:
+
+Success! The configuration is valid.
+
+These findings are based on Terraform configuration
+inspection and validation, not runtime testing.
 
 ### Security Review
 
@@ -66,18 +99,32 @@ No AWS resources created or modified.
 
 ![Terraform Validation](../screenshots/capstone-validation.png)
 
+
 ### Deployment Readiness
 
-The Terraform configuration is validated but not deployed.
+**NOT READY FOR DEPLOYMENT.**
 
-Remaining work includes:
+Completed configuration work:
 
-1. Systems Manager network connectivity
-2. Subnet routing design
-3. NGINX installation
-4. CloudWatch log delivery
-5. Alarm notifications
-6. AWS cost estimation
+1. Private subnet and route table design.
+2. Private SSM and SSM Messages endpoint definitions.
+3. Security group restrictions.
+4. IAM role and instance profile configuration.
+5. Terraform formatting and validation.
+
+Pending work:
+
+1. Verify SSM Agent installation and runtime status.
+2. Verify Systems Manager instance registration.
+3. Test Session Manager connectivity.
+4. Install and test NGINX.
+5. Configure and test CloudWatch log delivery.
+6. Configure alarm notifications.
+7. Complete AWS cost estimation and approval.
+8. Verify deployment permissions and service quotas.
+
+No Terraform resources have been deployed.
+
 
 ### Conclusion
 
